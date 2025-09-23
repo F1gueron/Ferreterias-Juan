@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Comentarios - Ferreterías Juan{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-comments text-primary me-2"></i>Comentarios de Clientes</h1>
+        <p class="lead">Comparte tu experiencia con nosotros</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- Formulario de comentarios -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-pencil-alt me-2"></i>Deja tu comentario</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" 
+                               name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" 
+                               name="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comentario" class="form-label">Comentario</label>
+                        <textarea class="form-control" id="comentario" 
+                                  name="comentario" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i>Enviar Comentario
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Ejemplos de XSS -->
+        <div class="card mt-3">
+            <div class="card-header bg-warning">
+                <h6 class="mb-0"><i class="fas fa-bug me-2"></i>Pruebas XSS (Solo para testing)</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Ejemplos de payloads XSS:</strong></p>
+                <div class="mb-2">
+                    <code>&lt;script&gt;alert('XSS Test')&lt;/script&gt;</code>
+                </div>
+                <div class="mb-2">
+                    <code>&lt;img src=x onerror=alert('XSS')&gt;</code>
+                </div>
+                <div class="mb-2">
+                    <code>&lt;svg onload=alert('XSS Ferretería Juan')&gt;</code>
+                </div>
+                <div class="mb-2">
+                    <code>&lt;iframe src=javascript:alert('XSS')&gt;</code>
+                </div>
+                <div class="mb-0">
+                    <code>&lt;body onload=alert('XSS')&gt;</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <!-- Lista de comentarios -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list me-2"></i>Comentarios Recientes</h5>
+            </div>
+            <div class="card-body">
+                {% if comentarios %}
+                    <div style="max-height: 600px; overflow-y: auto;">
+                        {% for comentario in comentarios %}
+                        <div class="mb-3 p-3 border rounded">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ comentario.nombre }}</strong>
+                                <small class="text-muted">{{ comentario.fecha.strftime('%d/%m/%Y %H:%M') }}</small>
+                            </div>
+                            {% if comentario.email %}
+                                <small class="text-muted d-block mb-2">{{ comentario.email }}</small>
+                            {% endif %}
+                            <!-- ⚠️ VULNERABILIDAD XSS: Salida sin escapar -->
+                            <div class="comment-content">
+                                {{ comentario.comentario|safe }}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted">
+                        <i class="fas fa-comment-slash fa-3x mb-3"></i>
+                        <p>No hay comentarios aún.</p>
+                        <p>¡Sé el primero en comentar!</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogo - Ferreterías Juan{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1><i class="fas fa-tools text-primary me-2"></i>Catálogo de Productos</h1>
+
+        <!-- Buscador VULNERABLE -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-search me-2"></i>Buscar Productos</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('catalogo') }}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" name="search" 
+                                   placeholder="Buscar productos..." 
+                                   value="{{ search if search else '' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="categoria">
+                                <option value="">Todas las categorías</option>
+                                {% for cat in categorias %}
+                                    <option value="{{ cat }}" {{ 'selected' if categoria == cat else '' }}>
+                                        {{ cat }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Ejemplos de SQL Injection -->
+                <div class="alert alert-warning mt-3">
+                    <strong><i class="fas fa-bug me-2"></i>Pruebas de SQL Injection:</strong>
+                    <div class="mt-2">
+                        <code class="me-3">' OR 1=1 --</code>
+                        <code class="me-3">' UNION SELECT 1,version(),3,4,5,6,7,8 --</code>
+                        <code>' AND (SELECT COUNT(*) FROM information_schema.tables) > 0 --</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mostrar error SQL si existe (VULNERABLE) -->
+        {% if error %}
+        <div class="alert alert-danger">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Error SQL</h5>
+            <pre class="mb-0"><code>{{ error }}</code></pre>
+        </div>
+        {% endif %}
+
+        <!-- Resultados -->
+        <div class="row">
+            {% if productos %}
+                <div class="col-12 mb-3">
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Encontrados {{ productos|length }} productos
+                        {% if search %} para "{{ search }}"{% endif %}
+                        {% if categoria %} en categoría "{{ categoria }}"{% endif %}
+                    </p>
+                </div>
+
+                {% for producto in productos %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header text-center bg-light">
+                            <i class="fas fa-wrench fa-2x text-primary"></i>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text">{{ producto.descripcion }}</p>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary">{{ producto.categoria }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong class="text-primary fs-4">€{{ "%.2f"|format(producto.precio) }}</strong>
+                                <small class="text-muted">Stock: {{ producto.stock }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-grid">
+                                <button class="btn btn-outline-primary" disabled>
+                                    <i class="fas fa-shopping-cart me-1"></i>Añadir al carrito
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                {% if search or categoria %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h4>No se encontraron productos</h4>
+                        <p>No hay productos que coincidan con tu búsqueda.</p>
+                        <a href="{{ url_for('catalogo') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-1"></i>Ver todos los productos
+                        </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning text-center">
+                        <i class="fas fa-tools fa-3x mb-3"></i>
+                        <h4>Cargando productos...</h4>
+                        <p>Por favor, espera mientras cargamos nuestro catálogo.</p>
+                    </div>
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
