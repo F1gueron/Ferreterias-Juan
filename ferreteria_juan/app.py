@@ -14,7 +14,8 @@ import logging
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'ferreteria_juan_secret_key_123'  # ⚠️ Clave débil intencional
+app.secret_key = 'ferreteria_juan_secret_key_123'  # ⚠️ Clave débil intencional (Vulnerable a CSRF y manipulación de sesión)
+
 
 # Configuración de la base de datos
 DB_CONFIG = {
@@ -167,8 +168,8 @@ def catalogo():
 
         # ⚠️ VULNERABILIDAD SQL INJECTION INTENCIONAL
         if search:
-            # Log para el Blue Team
-            app.logger.info(f"Búsqueda realizada: {search} desde IP: {request.remote_addr}")
+            # Log para el Blue Team TODO
+            # app.logger.info(f"Búsqueda realizada: {search} desde IP: {request.remote_addr}")
 
             # Query vulnerable - NO sanitizada
             query = f"SELECT * FROM productos WHERE nombre LIKE '%{search}%' OR descripcion LIKE '%{search}%'"
@@ -181,7 +182,7 @@ def catalogo():
             except Error as e:
                 app.logger.error(f"Error SQL: {e} - Query: {query}")
                 flash(f"Error en la búsqueda: {str(e)}", 'danger')
-                # Mostrar error para facilitar explotación (VULNERABLE)
+                # Mostrar error para facilitar explotación (VULNERABLE) TODO
                 return render_template('catalogo.html', productos=[], categorias=categorias, 
                                      search=search, categoria=categoria, error=str(e))
         else:
@@ -204,8 +205,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Log intento de login
-        app.logger.info(f"Intento de login: {username} desde IP: {request.remote_addr}")
+        # Log intento de login TODO
+        #app.logger.info(f"Intento de login: {username} desde IP: {request.remote_addr}")
 
         connection = get_db_connection()
         if connection:
@@ -235,8 +236,8 @@ def login():
                     flash('Usuario o contraseña incorrectos', 'danger')
 
             except Error as e:
-                app.logger.error(f"Error SQL en login: {e} - Query: {query}")
-                # Mostrar error SQL para facilitar explotación
+                #app.logger.error(f"Error SQL en login: {e} - Query: {query}")
+                # Mostrar error SQL para facilitar explotación TODO:
                 flash(f'Error en el sistema: {str(e)}', 'danger')
 
             cursor.close()
@@ -252,8 +253,8 @@ def comentarios():
         email = request.form['email']
         comentario = request.form['comentario']
 
-        # Log comentario
-        app.logger.info(f"Nuevo comentario de: {nombre} ({email})")
+        # Log comentario TODO:
+        #app.logger.info(f"Nuevo comentario de: {nombre} ({email})")
 
         connection = get_db_connection()
         if connection:
@@ -332,8 +333,8 @@ def upload_file():
 
         # ⚠️ VULNERABILIDAD: Sin validación de tipo de archivo
         if file:
-            # Log upload
-            app.logger.warning(f"Archivo subido: {file.filename} por {session.get('username')}")
+            # Log upload TODO
+            #app.logger.warning(f"Archivo subido: {file.filename} por {session.get('username')}")
 
             # Guardar archivo sin validación (VULNERABLE)
             filename = file.filename  # Sin secure_filename() intencionalmente
