@@ -153,6 +153,11 @@ def index():
 
     return render_template('index.html', productos=productos_destacados)
 
+@app.route('/whoAreUs')
+def quienes_somos():
+    return render_template('whoAreUs.html')
+
+
 @app.route('/catalogo')
 def catalogo():
     """Catálogo de productos con búsqueda VULNERABLE"""
