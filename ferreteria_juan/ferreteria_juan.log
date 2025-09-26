@@ -246,3 +246,20 @@
 2025-09-25 16:32:56,753 - INFO - 127.0.0.1 - - [25/Sep/2025 16:32:56] "GET /whoAreUs HTTP/1.1" 200 -
 2025-09-25 16:32:57,093 - INFO - 127.0.0.1 - - [25/Sep/2025 16:32:57] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
 2025-09-25 16:32:57,123 - INFO - 127.0.0.1 - - [25/Sep/2025 16:32:57] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+2025-09-25 16:38:14,868 - ERROR - Error conectando a MySQL: 2003: Can't connect to MySQL server on 'localhost:3306' (111 Connection refused)
+2025-09-25 16:38:14,878 - WARNING -  * Debugger is active!
+2025-09-25 16:38:14,882 - INFO -  * Debugger PIN: 338-460-574
+2025-09-26 16:53:03,135 - INFO - 127.0.0.1 - - [26/Sep/2025 16:53:03] "GET /whoAreUs HTTP/1.1" 200 -
+2025-09-26 16:53:03,554 - INFO - 127.0.0.1 - - [26/Sep/2025 16:53:03] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+2025-09-26 16:53:03,557 - INFO - 127.0.0.1 - - [26/Sep/2025 16:53:03] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+2025-09-26 16:53:03,962 - INFO - 127.0.0.1 - - [26/Sep/2025 16:53:03] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-09-26 16:53:50,623 - ERROR - Error conectando a MySQL: 2003: Can't connect to MySQL server on 'localhost:3306' (111 Connection refused)
+2025-09-26 16:53:50,629 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:80
+ * Running on http://10.0.2.15:80
+2025-09-26 16:53:50,629 - INFO - [33mPress CTRL+C to quit[0m
+2025-09-26 16:53:50,630 - INFO -  * Restarting with stat
+2025-09-26 16:53:50,858 - ERROR - Error conectando a MySQL: 2003: Can't connect to MySQL server on 'localhost:3306' (111 Connection refused)
+2025-09-26 16:53:50,865 - WARNING -  * Debugger is active!
+2025-09-26 16:53:50,873 - INFO -  * Debugger PIN: 338-460-574
