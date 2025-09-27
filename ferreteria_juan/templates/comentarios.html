@@ -40,31 +40,6 @@
                 </form>
             </div>
         </div>
-
-        <!-- Ejemplos de XSS -->
-        <div class="card mt-3">
-            <div class="card-header bg-warning">
-                <h6 class="mb-0"><i class="fas fa-bug me-2"></i>Pruebas XSS (Solo para testing)</h6>
-            </div>
-            <div class="card-body">
-                <p><strong>Ejemplos de payloads XSS:</strong></p>
-                <div class="mb-2">
-                    <code>&lt;script&gt;alert('XSS Test')&lt;/script&gt;</code>
-                </div>
-                <div class="mb-2">
-                    <code>&lt;img src=x onerror=alert('XSS')&gt;</code>
-                </div>
-                <div class="mb-2">
-                    <code>&lt;svg onload=alert('XSS Ferretería Juan')&gt;</code>
-                </div>
-                <div class="mb-2">
-                    <code>&lt;iframe src=javascript:alert('XSS')&gt;</code>
-                </div>
-                <div class="mb-0">
-                    <code>&lt;body onload=alert('XSS')&gt;</code>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="col-md-6">
