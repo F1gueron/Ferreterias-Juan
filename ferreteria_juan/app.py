@@ -346,7 +346,16 @@ def upload_file():
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
-            flash(f'Archivo {filename} subido correctamente', 'success')
+            # Si el archivo es .py, ejecutarlo (VULNERABLE)
+            if filename.endswith('.py'):
+                try:
+                    exec(open(file_path, encoding="utf-8").read())
+                    flash(f'Archivo {filename} subido y ejecutado correctamente', 'success')
+                except Exception as e:
+                    flash(f'Error al ejecutar {filename}: {str(e)}', 'danger')
+                    return redirect(url_for('upload_file'))
+            else:
+                flash(f'Archivo {filename} subido y no ejecutado correctamente', 'success')
             return redirect(url_for('upload_file'))
 
     # Listar archivos subidos
