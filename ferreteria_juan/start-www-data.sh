@@ -1,7 +1,21 @@
 #!/bin/bash
 
-# Script para iniciar Ferreterías Juan
-echo "🔨 Iniciando Ferreterías Juan..."
+# Script para iniciar Ferreterías Juan como www-data
+echo "🔨 Iniciando Ferreterías Juan como www-data..."
+
+# Verificar si el usuario actual es www-data o si podemos cambiar a www-data
+if [ "$(whoami)" != "www-data" ]; then
+    if [ "$EUID" -eq 0 ]; then
+        echo "📋 Cambiando a usuario www-data..."
+        exec sudo -u www-data "$0" "$@"
+    else
+        echo "❌ Error: Se requieren privilegios para cambiar a www-data"
+        echo "Ejecuta: sudo $0"
+        exit 1
+    fi
+fi
+
+echo "✅ Ejecutándose como usuario www-data"
 
 # Verificar si estamos en el directorio correcto
 if [ ! -f "app.py" ]; then
@@ -34,39 +48,26 @@ if [ ! -d "$UPLOADS_DIR" ]; then
     mkdir -p "$UPLOADS_DIR"
 fi
 
+# Asegurar permisos correctos para www-data
+echo "🔐 Configurando permisos para www-data..."
+chown -R www-data:www-data static/uploads 2>/dev/null || true
+chmod -R 755 static/uploads 2>/dev/null || true
+
 # Mostrar información importante
 echo ""
-echo "🚀 Iniciando servidor Flask..."
+echo "🚀 Iniciando servidor Flask como www-data..."
 echo ""
 echo "⚠️  IMPORTANTE:"
 echo "  • Esta aplicación contiene vulnerabilidades INTENCIONALES"
 echo "  • Solo para uso educativo en laboratorio"
-echo "  • Puerto 80 (requiere privilegios root o usar puerto >1024)"
+echo "  • Ejecutándose como www-data para mayor seguridad"
 echo ""
 echo "📱 URLs de acceso:"
-echo "  • Principal: http://localhost"
-echo "  • Login: http://localhost/login (admin/admin123)"
+echo "  • Principal: http://localhost:8080"
+echo "  • Login: http://localhost:8080/login (admin/admin123)"
 echo ""
 echo "🔧 Para detener: Ctrl+C"
 echo ""
 
-# Verificar puerto 80
-if [ "$EUID" -ne 0 ]; then
-    echo "⚠️  Advertencia: No tienes privilegios root."
-    echo "La aplicación intentará usar puerto 80 y puede fallar."
-    echo "Alternativas:"
-    echo "  1. Ejecutar como root: sudo ./start.sh"
-    echo "  2. Ejecutar como www-data: sudo -u www-data ./start.sh"
-    echo "  3. Cambiar puerto en app.py (línea final) a 5000 o 8080"
-    echo ""
-fi
-
-# Verificar si se está ejecutando como www-data
-if [ "$(whoami)" = "www-data" ]; then
-    echo "✅ Ejecutándose como usuario www-data"
-elif [ "$EUID" -eq 0 ]; then
-    echo "⚠️  Ejecutándose como root - considera usar www-data para mayor seguridad"
-fi
-
-# Iniciar aplicación
+# Iniciar aplicación en puerto 8080 (www-data no puede usar puerto 80)
 python3 app.py
