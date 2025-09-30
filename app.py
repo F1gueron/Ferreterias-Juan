@@ -9,12 +9,10 @@ import mysql.connector
 from mysql.connector import Error
 import os
 from werkzeug.utils import secure_filename
-import hashlib
-import logging
 from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = 'ferreteria_juan_secret_key_123' 
+app.secret_key = 'ferreteria_juan_secret_key_123'  # ⚠️ Clave débil intencional (Vulnerable a CSRF y manipulación de sesión)
 
 
 # Configuración de la base de datos
@@ -22,15 +20,16 @@ DB_CONFIG = {
     'host': 'localhost',
     'database': 'ferreteria_juan',
     'user': 'ferreteria_user',
-    'password': 'ferreteria_pass123',
+    'password': 'ferreteria_pass123',  # ⚠️ Contraseña débil intencional
     'port': 3306
 }
 
-# Configuración de uploads
+# Configuración de uploads (VULNERABLE)
 UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'php', 'py'}  
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'php', 'py'}  # ⚠️ Permite archivos peligrosos
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+
 
 def get_db_connection():
     """Obtener conexión a la base de datos"""
@@ -146,9 +145,9 @@ def index():
 
     return render_template('index.html', productos=productos_destacados)
 
-@app.route('/aboutus')
+@app.route('/aboutUs')
 def quienes_somos():
-    return render_template('about_us.html')
+    return render_template('aboutUs.html')
 
 
 @app.route('/catalogo')
@@ -165,8 +164,6 @@ def catalogo():
         cursor = connection.cursor(dictionary=True)
 
         if search:
-
-            # Query vulnerable - NO sanitizada
             query = f"SELECT * FROM productos WHERE nombre LIKE '%{search}%' OR descripcion LIKE '%{search}%'"
             if categoria:
                 query += f" AND categoria = '{categoria}'"
@@ -233,6 +230,8 @@ def comentarios():
         email = request.form['email']
         comentario = request.form['comentario']
 
+
+
         connection = get_db_connection()
         if connection:
             cursor = connection.cursor()
@@ -246,8 +245,10 @@ def comentarios():
             cursor.close()
             connection.close()
 
+            flash('Comentario enviado correctamente', 'success')
             return redirect(url_for('comentarios'))
 
+    # Obtener comentarios existentes
     connection = get_db_connection()
     comentarios_list = []
 
@@ -306,14 +307,17 @@ def upload_file():
             return redirect(request.url)
 
         if file:
-            filename = file.filename 
+            filename = file.filename  
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
             if filename.endswith('.py'):
-                exec(open(file_path, encoding="utf-8").read())
-                flash(f'Archivo {filename} subido y ejecutado correctamente', 'success')
-            
+                try:
+                    exec(open(file_path, encoding="utf-8").read())
+                    flash(f'Archivo {filename} subido y ejecutado correctamente', 'success')
+                except Exception as e:
+                    flash(f'Error al ejecutar {filename}: {str(e)}', 'danger')
+                    return redirect(url_for('upload_file'))
             else:
                 flash(f'Archivo {filename} subido y no ejecutado correctamente', 'success')
             return redirect(url_for('upload_file'))
@@ -336,6 +340,20 @@ def logout():
     flash('Sesión cerrada correctamente', 'info')
     return redirect(url_for('index'))
 
+@app.route('/debug')
+def debug():
+    """Endpoint de debug que expone información sensible"""
+    if not app.debug:  # Solo en modo debug
+        return "Debug mode disabled", 404
+
+    debug_info = {
+        'session': dict(session),
+        'db_config': DB_CONFIG,
+        'app_config': dict(app.config),
+        'environment': dict(os.environ)
+    }
+
+    return jsonify(debug_info)
 
 if __name__ == '__main__':
     # Inicializar base de datos

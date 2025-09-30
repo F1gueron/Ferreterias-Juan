@@ -18,8 +18,8 @@ fi
 echo "✅ Ejecutándose como usuario www-data"
 
 # Verificar si estamos en el directorio correcto
-if [ ! -f "src/app.py" ]; then
-    echo "❌ Error: No se encuentra src/app.py"
+if [ ! -f "app.py" ]; then
+    echo "❌ Error: No se encuentra app.py"
     echo "Ejecuta este script desde el directorio ferreteria_juan"
     exit 1
 fi
@@ -64,4 +64,4 @@ echo "🔧 Para detener: Ctrl+C"
 echo ""
 
 # Iniciar aplicación en puerto 8080 
-python3 src/app.py
+python3 app.py
