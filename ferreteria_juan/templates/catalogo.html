@@ -7,7 +7,7 @@
     <div class="col-12">
         <h1><i class="fas fa-tools text-primary me-2"></i>Catálogo de Productos</h1>
 
-        <!-- Buscador -->
+        <!-- Buscador VULNERABLE -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5><i class="fas fa-search me-2"></i>Buscar Productos</h5>
@@ -39,6 +39,14 @@
                 </form>
             </div>
         </div>
+
+        <!-- Mostrar error SQL si existe (VULNERABLE) -->
+        {% if error %}
+        <div class="alert alert-danger">
+            <h5><i class="fas fa-exclamation-triangle me-2"></i>Error SQL</h5>
+            <pre class="mb-0"><code>{{ error }}</code></pre>
+        </div>
+        {% endif %}
 
         <!-- Resultados -->
         <div class="row">

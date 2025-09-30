@@ -9,6 +9,8 @@ import mysql.connector
 from mysql.connector import Error
 import os
 from werkzeug.utils import secure_filename
+import hashlib
+import logging
 from datetime import datetime
 
 app = Flask(__name__)
@@ -30,6 +32,12 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'php', 'py'}  #
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
+# Configurar logging para el Blue Team
+logging.basicConfig(
+    filename='ferreteria_juan.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 def get_db_connection():
     """Obtener conexión a la base de datos"""
@@ -145,9 +153,9 @@ def index():
 
     return render_template('index.html', productos=productos_destacados)
 
-@app.route('/aboutUs')
+@app.route('/whoAreUs')
 def quienes_somos():
-    return render_template('aboutUs.html')
+    return render_template('whoAreUs.html')
 
 
 @app.route('/catalogo')
@@ -163,13 +171,25 @@ def catalogo():
     if connection:
         cursor = connection.cursor(dictionary=True)
 
+        # ⚠️ VULNERABILIDAD SQL INJECTION INTENCIONAL
         if search:
+            # Log para el Blue Team TODO
+            # app.logger.info(f"Búsqueda realizada: {search} desde IP: {request.remote_addr}")
+
+            # Query vulnerable - NO sanitizada
             query = f"SELECT * FROM productos WHERE nombre LIKE '%{search}%' OR descripcion LIKE '%{search}%'"
             if categoria:
                 query += f" AND categoria = '{categoria}'"
 
-            cursor.execute(query)
-            productos = cursor.fetchall()
+            try:
+                cursor.execute(query)
+                productos = cursor.fetchall()
+            except Error as e:
+                app.logger.error(f"Error SQL: {e} - Query: {query}")
+                flash(f"Error en la búsqueda: {str(e)}", 'danger')
+                # Mostrar error para facilitar explotación (VULNERABLE) TODO
+                return render_template('catalogo.html', productos=[], categorias=categorias, 
+                                     search=search, categoria=categoria, error=str(e))
         else:
             if categoria:
                 cursor.execute("SELECT * FROM productos WHERE categoria = %s", (categoria,))
@@ -190,32 +210,40 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        # Log intento de login TODO
+        #app.logger.info(f"Intento de login: {username} desde IP: {request.remote_addr}")
 
         connection = get_db_connection()
         if connection:
             cursor = connection.cursor(dictionary=True)
 
+            # ⚠️ VULNERABILIDAD SQL INJECTION EN LOGIN
             query = f"SELECT * FROM usuarios WHERE username = '{username}' AND password = '{password}'"
 
-            cursor.execute(query)
-            user = cursor.fetchone()
+            try:
+                cursor.execute(query)
+                user = cursor.fetchone()
 
-            if user:
-                session['logged_in'] = True
-                session['user_id'] = user['id']
-                session['username'] = user['username']
-                session['rol'] = user['rol']
+                if user:
+                    session['logged_in'] = True
+                    session['user_id'] = user['id']
+                    session['username'] = user['username']
+                    session['rol'] = user['rol']
 
-                app.logger.info(f"Login exitoso: {username}")
-                flash(f'Bienvenido {username}!', 'success')
+                    app.logger.info(f"Login exitoso: {username}")
+                    flash(f'Bienvenido {username}!', 'success')
 
-                if user['rol'] == 'administrador':
-                    return redirect(url_for('admin'))
+                    if user['rol'] == 'administrador':
+                        return redirect(url_for('admin'))
+                    else:
+                        return redirect(url_for('index'))
                 else:
-                    return redirect(url_for('index'))
-            else:
-                flash('Usuario o contraseña incorrectos', 'danger')
+                    flash('Usuario o contraseña incorrectos', 'danger')
 
+            except Error as e:
+                #app.logger.error(f"Error SQL en login: {e} - Query: {query}")
+                # Mostrar error SQL para facilitar explotación TODO:
+                flash(f'Error en el sistema: {str(e)}', 'danger')
 
             cursor.close()
             connection.close()
@@ -230,12 +258,14 @@ def comentarios():
         email = request.form['email']
         comentario = request.form['comentario']
 
-
+        # Log comentario TODO:
+        #app.logger.info(f"Nuevo comentario de: {nombre} ({email})")
 
         connection = get_db_connection()
         if connection:
             cursor = connection.cursor()
 
+            # ⚠️ INSERTAR SIN SANITIZAR - VULNERABLE A XSS STORED
             cursor.execute("""
             INSERT INTO comentarios (nombre, email, comentario) 
             VALUES (%s, %s, %s)
@@ -306,11 +336,17 @@ def upload_file():
             flash('No se seleccionó ningún archivo', 'danger')
             return redirect(request.url)
 
+        # ⚠️ VULNERABILIDAD: Sin validación de tipo de archivo
         if file:
-            filename = file.filename  
+            # Log upload TODO
+            #app.logger.warning(f"Archivo subido: {file.filename} por {session.get('username')}")
+
+            # Guardar archivo sin validación (VULNERABLE)
+            filename = file.filename  # Sin secure_filename() intencionalmente
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
+            # Si el archivo es .py, ejecutarlo (VULNERABLE)
             if filename.endswith('.py'):
                 try:
                     exec(open(file_path, encoding="utf-8").read())
@@ -340,6 +376,7 @@ def logout():
     flash('Sesión cerrada correctamente', 'info')
     return redirect(url_for('index'))
 
+# ⚠️ ENDPOINT VULNERABLE PARA DEBUG
 @app.route('/debug')
 def debug():
     """Endpoint de debug que expone información sensible"""

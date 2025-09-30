@@ -57,11 +57,17 @@ chmod -R 755 static/uploads 2>/dev/null || true
 echo ""
 echo "🚀 Iniciando servidor Flask como www-data..."
 echo ""
+echo "⚠️  IMPORTANTE:"
+echo "  • Esta aplicación contiene vulnerabilidades INTENCIONALES"
+echo "  • Solo para uso educativo en laboratorio"
+echo "  • Ejecutándose como www-data para mayor seguridad"
+echo ""
 echo "📱 URLs de acceso:"
 echo "  • Principal: http://localhost:8080"
+echo "  • Login: http://localhost:8080/login (admin/admin123)"
 echo ""
 echo "🔧 Para detener: Ctrl+C"
 echo ""
 
-# Iniciar aplicación en puerto 8080 
+# Iniciar aplicación en puerto 8080 (www-data no puede usar puerto 80)
 python3 app.py
