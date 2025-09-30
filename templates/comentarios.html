@@ -60,7 +60,6 @@
                             {% if comentario.email %}
                                 <small class="text-muted d-block mb-2">{{ comentario.email }}</small>
                             {% endif %}
-                            <!-- ⚠️ VULNERABILIDAD XSS: Salida sin escapar -->
                             <div class="comment-content">
                                 {{ comentario.comentario|safe }}
                             </div>

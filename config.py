@@ -7,25 +7,23 @@ import os
 
 class Config:
     # Configuración de Flask
-    SECRET_KEY = 'ferreteria_juan_secret_key_123'  # ⚠️ Clave débil intencional
-    DEBUG = True  # ⚠️ Debug habilitado en producción (VULNERABLE)
+    SECRET_KEY = 'ferreteria_juan_secret_key_123'  
+    DEBUG = True 
 
     # Configuración de base de datos
     DB_CONFIG = {
         'host': 'localhost',
         'database': 'ferreteria_juan',
         'user': 'ferreteria_user',
-        'password': 'ferreteria_pass123',  # ⚠️ Contraseña débil
+        'password': 'ferreteria_pass123', 
         'port': 3306,
         'charset': 'utf8mb4',
         'autocommit': True
     }
 
-    # Configuración de uploads (VULNERABLE)
     UPLOAD_FOLDER = 'static/uploads'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
     ALLOWED_EXTENSIONS = {
-        # ⚠️ Permite extensiones peligrosas intencionalmente
         'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff',
         'php', 'py', 'js', 'html', 'htm', 'css', 'sh', 'bat', 'exe'
     }
@@ -35,20 +33,19 @@ class Config:
     LOG_LEVEL = 'DEBUG'
     LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 
-    # Configuración de seguridad (DÉBIL INTENCIONAL)
-    SESSION_COOKIE_SECURE = False  # ⚠️ Cookies inseguras
-    SESSION_COOKIE_HTTPONLY = False  # ⚠️ Accesibles desde JS
+    # Configuración de seguridad 
+    SESSION_COOKIE_SECURE = False  
+    SESSION_COOKIE_HTTPONLY = False 
     PERMANENT_SESSION_LIFETIME = 3600 * 24  # 24 horas
 
     # URLs y rutas importantes
     BASE_URL = 'http://localhost'
     ADMIN_PATH = '/admin'
-    DEBUG_PATH = '/debug'  # ⚠️ Endpoint de debug expuesto
 
-    # Credenciales por defecto (DÉBILES)
+    # Credenciales por defecto 
     DEFAULT_ADMIN = {
         'username': 'admin',
-        'password': 'admin123',  # ⚠️ Contraseña débil
+        'password': 'admin123',  
         'email': 'admin@ferreteriajuan.com'
     }
 
@@ -87,10 +84,10 @@ class TestingConfig(Config):
         'port': 3306
     }
 
-# Configuración por defecto (VULNERABLE)
+# Configuración por defecto 
 config = {
     'development': DevelopmentConfig,
-    'production': ProductionConfig,  # NO USAR
+    'production': ProductionConfig,  
     'testing': TestingConfig,
-    'default': DevelopmentConfig  # ⚠️ Por defecto es vulnerable
+    'default': DevelopmentConfig  
 }
